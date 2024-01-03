@@ -16,14 +16,43 @@
         public U Second { get; set; }
     };
 
-    public struct Character
+    public class Character
     {
         public int Level { get; set; }
         public string Name { get; set; }
-        public int Attack { get; set; }
-        public int Defense { get; set; }
+
+        public int _attack;
+        public int Attack
+        {
+            get
+            {
+                return (MyWeapon != null)? _attack + MyWeapon.Attack : _attack;
+            }
+            set
+            {
+                _attack = value;
+            }
+        }
+
+        public int _defense;
+        public int Defense
+        {
+            get
+            {
+                return (MyArmor != null)? _defense + MyArmor.Defense : _defense;
+            }
+            set
+            {
+                _defense = value;
+            }
+        }
+
         public int Health { get; set; }
         public int Gold { get; set; }
+        public Weapon MyWeapon { get; set; }
+        public Armor MyArmor { get; set; }
+
+        public List<Item> items;
 
         public Character(int level, string name, int attack, int defense, int health, int gold)
         {
@@ -33,6 +62,28 @@
             Defense = defense;
             Health = health;
             Gold = gold;
+            items = new List<Item>();
+        }
+
+        public void AddItem(Item item)
+        {
+            items.Add(item);
+        }
+
+        public void Equip(Item item)
+        {
+            if(item is Weapon weapon) MyWeapon = weapon;
+            else if(item is Armor armor) MyArmor = armor;
+        }
+
+        public int GetMyWeaponValue()
+        {
+            return MyWeapon == null ? 0 : MyWeapon.Attack;
+        }
+
+        public int GetMyArmorValue()
+        {
+            return MyArmor == null ? 0 : MyArmor.Defense;
         }
     }
 
@@ -90,29 +141,6 @@
         }
     }
 
-    public class Shop
-    {
-        public List<Pair<Item, bool>> shopItems;
-        public Shop(List<Item> items)
-        {
-            shopItems = new List<Pair<Item, bool>>();
-            foreach (Item item in items)
-            {
-                shopItems.Add(new Pair<Item, bool>(item, true));
-            }
-        }
-
-        public bool isEnoughMoney(int characterGold, int index)
-        {
-            return shopItems[index].First.Price <= characterGold;
-        }
-
-        public void Buy(int index)
-        {
-            shopItems[index].Second = false;
-        }
-    }
-
     internal class Program
     {
         // 시작 마을
@@ -140,9 +168,16 @@
             bool isAvailableInput = true;
             do
             {
-                Console.Write(">> ");
-                input = int.Parse(Console.ReadLine());
                 isAvailableInput = true;
+                Console.Write(">> ");
+                
+                string? s;
+                s = Console.ReadLine();
+                if(!int.TryParse(s, out input))
+                {
+                    input = -1;
+                }
+
                 switch (input)
                 {
                     case 0:
@@ -159,8 +194,8 @@
         {
             Console.WriteLine($"Lv. {character.Level:D2}");
             Console.WriteLine($"{character.Name} ( 전사 )");
-            Console.WriteLine($"공격력 : {character.Attack}");
-            Console.WriteLine($"방어력 : {character.Defense} ");
+            Console.WriteLine($"공격력 : {character.Attack} (+{character.GetMyWeaponValue()})");
+            Console.WriteLine($"방어력 : {character.Defense} (+{character.GetMyArmorValue()})");
             Console.WriteLine($"체 력 : {character.Health}");
             Console.WriteLine($"Gold : {character.Gold} G");
             Console.WriteLine();
@@ -172,42 +207,35 @@
 
         // 인벤토리
         #region
-        public void MyInventory()
+
+        public void MyInventory(Character character)
         {
-            Console.Clear();
-
-        }
-
-        public void DrawMyInventory()
-        {
-
-        }
-        #endregion
-
-        // 상점
-        #region
-        public void Shop(Character character, Shop shop)
-        {
-            bool isBuyPage = false;
+            bool isEquipPage = false;
             while (true)
             {
                 Console.Clear();
-                DrawShop(isBuyPage, character, shop);
-                if(!isBuyPage)
+                DrawMyInventory(isEquipPage, character);
+                if (!isEquipPage)
                 {
                     int input;
                     bool isAvailableInput = true;
                     do
                     {
-                        Console.Write(">> ");
-                        input = int.Parse(Console.ReadLine());
                         isAvailableInput = true;
+                        Console.Write(">> ");
+
+                        string? s = Console.ReadLine();
+                        if(!int.TryParse(s, out input))
+                        {
+                            input = -1;
+                        }
+
                         switch (input)
                         {
                             case 0:
                                 return;
                             case 1:
-                                isBuyPage = true;
+                                isEquipPage = true;
                                 break;
                             default:
                                 Console.WriteLine("잘못된 입력입니다.");
@@ -219,35 +247,35 @@
                 else
                 {
                     int input;
-                    bool isAvailableInput = true;
-                    while(true)
+                    while (true)
                     {
                         Console.Write(">> ");
-                        input = int.Parse(Console.ReadLine());
-                        if(input == 0)
+                        string? s = Console.ReadLine();
+                        if (!int.TryParse(s, out input))
                         {
-                            isBuyPage = !isBuyPage;
+                            input = -1;
+                        }
+
+                        if (input == 0)
+                        {
+                            isEquipPage = !isEquipPage;
                             break;
                         }
-                        else if(input >= 1 && input <= shop.shopItems.Count)
+                        else if (input >= 1 && input <= character.items.Count)
                         {
-                            if (shop.isEnoughMoney(character.Gold, input - 1))
-                            {
-                                Console.WriteLine("구매를 완료했습니다.");
-                                shop.Buy(input - 1);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Gold 가 부족합니다.");
-                            }
+                            character.Equip(character.items[input - 1]);
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("잘못된 입력입니다.");
                         }
                     }
                 }
             }
-            
         }
 
-        public void DrawShop(bool isBuyPage, Character character, Shop shop)
+        public void DrawMyInventory(bool isEquipPage, Character character)
         {
             Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
             Console.WriteLine();
@@ -256,39 +284,40 @@
             Console.WriteLine();
             Console.WriteLine("[아이템 목록]");
             int i = 1;
-            foreach(var item in shop.shopItems)
+            foreach (var item in character.items)
             {
                 Console.Write("- ");
-                if(isBuyPage)
+                if (isEquipPage)
                 {
                     Console.Write($"{i} ");
                 }
-                Console.Write($"{item.First.Name}\t| ");
-                if(item.First is Weapon weapon)
+                if(item == character.MyWeapon || item == character.MyArmor)
+                {
+                    Console.Write("[E]");
+                }
+                Console.Write($"{item.Name}\t| ");
+                if (item is Weapon weapon)
                 {
                     Console.Write($"공격력 +{weapon.Attack}  | ");
                 }
-                else if(item.First is Armor armor)
+                else if (item is Armor armor)
                 {
                     Console.Write($"방어력 +{armor.Defense}  | ");
                 }
-                Console.Write($"{item.First.Description}  | ");
-                if (item.Second)
-                    Console.Write($"{item.First.Price} G");
-                else
-                    Console.Write("구매완료");
-                Console.WriteLine() ;
+                Console.Write($"{item.Description}");
+                Console.WriteLine();
                 i++;
             }
 
             Console.WriteLine();
-            if (!isBuyPage)
-                Console.WriteLine("1. 아이템 구매");
+            if (!isEquipPage)
+                Console.WriteLine("1. 장착 관리");
             Console.WriteLine("0. 나가기");
             Console.WriteLine();
             Console.WriteLine("원하시는 행동을 입력해주세요.");
         }
         #endregion
+
 
         public List<Item> InitItem()
         {
@@ -306,7 +335,7 @@
         static void Main(string[] args)
         {
             Program program = new Program();
-            Character myCharacter = new Character(1, "Chad", 10, 5, 100, 1500);
+            Character myCharacter = new Character(1, "Chad", 10, 5, 100, 5000);
             List<Item> items = program.InitItem();
             Shop shop = new Shop(items);
 
@@ -318,18 +347,26 @@
                 bool isAvailableInput = false;
                 do
                 {
-                    Console.Write(">> ");
-                    input = int.Parse(Console.ReadLine());
                     isAvailableInput = false;
+                    Console.Write(">> ");
+
+                    string? s;
+                    s = Console.ReadLine();
+                    if (!int.TryParse(s, out input))
+                    {
+                        input = -1;
+                    }
+                    
                     switch (input)
                     {
                         case 1:
                             program.MyStat(myCharacter);
                             break;
                         case 2:
+                            program.MyInventory(myCharacter);
                             break;
                         case 3:
-                            program.Shop(myCharacter, shop);
+                            shop.EnterShop(myCharacter);
                             break;
                         case 4:
                             break;
