@@ -48,6 +48,8 @@
         }
 
         public int Health { get; set; }
+
+        public int MaxHealth { get; private set; }
         public int Gold { get; set; }
         public Weapon? MyWeapon { get; set; }
         public Armor? MyArmor { get; set; }
@@ -63,6 +65,7 @@
             Health = health;
             Gold = gold;
             items = new List<Item>();
+            MaxHealth = 100;
         }
 
         public void AddItem(Item item)
@@ -368,9 +371,10 @@
         static void Main(string[] args)
         {
             Program program = new Program();
-            Character myCharacter = new Character(1, "Chad", 10, 5, 100, 5000);
+            Character myCharacter = new Character(1, "Chad", 10, 5, 50, 5000);
             List<Item> items = program.InitItem();
             Shop shop = new Shop(items);
+            Rest rest = new Rest();
 
             while (true)
             {
@@ -404,6 +408,7 @@
                         case 4:
                             break;
                         case 5:
+                            rest.EnterRestRoom(myCharacter);
                             break;
                         default:
                             Console.WriteLine("잘못된 입력입니다.");
