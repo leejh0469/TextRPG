@@ -49,8 +49,8 @@
 
         public int Health { get; set; }
         public int Gold { get; set; }
-        public Weapon MyWeapon { get; set; }
-        public Armor MyArmor { get; set; }
+        public Weapon? MyWeapon { get; set; }
+        public Armor? MyArmor { get; set; }
 
         public List<Item> items;
 
@@ -70,8 +70,32 @@
             items.Add(item);
         }
 
+        public void RemoveItem(int index)
+        {
+            Item item = items[index];
+            if (item == MyWeapon) UnEquipWeapon();
+            else if(item == MyArmor) UnEquipArmor();
+
+            items.RemoveAt(index);
+        }
+
+        public Item GetItemFromIndex(int index)
+        {
+            return items[index];
+        }
+
         public void Equip(Item item)
         {
+            if(item == MyWeapon)
+            {
+                UnEquipWeapon();
+                return;
+            }
+            else if(item == MyArmor)
+            {
+                UnEquipArmor();
+                return;
+            }
             if(item is Weapon weapon) MyWeapon = weapon;
             else if(item is Armor armor) MyArmor = armor;
         }
@@ -84,6 +108,16 @@
         public int GetMyArmorValue()
         {
             return MyArmor == null ? 0 : MyArmor.Defense;
+        }
+
+        public void UnEquipWeapon()
+        {
+            MyWeapon = null;
+        }
+
+        public void UnEquipArmor()
+        {
+            MyArmor = null;
         }
     }
 
@@ -99,7 +133,6 @@
             Description = description;
             Price = price;
         }
-
     }
 
     public class Weapon : Item
