@@ -371,10 +371,11 @@
         static void Main(string[] args)
         {
             Program program = new Program();
-            Character myCharacter = new Character(1, "Chad", 10, 5, 50, 5000);
+            Character myCharacter = new Character(1, "Chad", 10, 5, 100, 5000);
             List<Item> items = program.InitItem();
             Shop shop = new Shop(items);
             Rest rest = new Rest();
+            Dungeon dungeon = new Dungeon();
 
             while (true)
             {
@@ -406,6 +407,7 @@
                             shop.EnterShop(myCharacter);
                             break;
                         case 4:
+                            dungeon.EnterDungeon(myCharacter);
                             break;
                         case 5:
                             rest.EnterRestRoom(myCharacter);
