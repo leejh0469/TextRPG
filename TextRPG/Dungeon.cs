@@ -19,6 +19,8 @@ namespace TextRPG
         public int Reward { get; set; }
         public int RecommendDefense { get; set; }
 
+        public int DungeonEXP { get; set; }
+
         public string Name { get; set; }
     }
 
@@ -91,16 +93,19 @@ namespace TextRPG
                     dungeon.Reward = 1000;
                     dungeon.RecommendDefense = 5;
                     dungeon.Name = "쉬운 던전";
+                    dungeon.DungeonEXP = 1;
                     break;
                 case Difficulty.Normal:
                     dungeon.Reward = 1700;
                     dungeon.RecommendDefense = 11;
                     dungeon.Name = "보통 던전";
+                    dungeon.DungeonEXP = 1;
                     break;
                 case Difficulty.Hard:
                     dungeon.Reward = 2500;
                     dungeon.RecommendDefense = 17;
                     dungeon.Name = "어려운 던전";
+                    dungeon.DungeonEXP = 1;
                     break;
                 default:
                     break;
@@ -153,6 +158,7 @@ namespace TextRPG
 
             character.Health -= dungeon.Damage;
             character.Gold += dungeon.Reward;
+            character.AddExp(dungeon.DungeonEXP);
 
             int input;
             while (true)
