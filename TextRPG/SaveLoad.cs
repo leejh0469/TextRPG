@@ -19,7 +19,8 @@ namespace TextRPG
 
         public void SaveShopItem(List<Pair<Item, bool>> shopItems)
         {
-            string json = JsonConvert.SerializeObject(shopItems);
+            JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
+            string json = JsonConvert.SerializeObject(shopItems, settings);
             File.WriteAllText(@"ShopItems.json", json);
         }
 
@@ -76,7 +77,7 @@ namespace TextRPG
                 }
                 foreach(var item in character.items)
                 {
-                    if (character.MyWeapon.Name == item.Name)
+                    if (character.MyWeapon?.Name == item.Name)
                     {
                         character.MyWeapon = item as Weapon;
                         break;
@@ -84,7 +85,7 @@ namespace TextRPG
                 }
                 foreach(var item in character.items)
                 {
-                    if(character.MyArmor.Name == item.Name)
+                    if(character.MyArmor?.Name == item.Name)
                     {
                         character.MyArmor = item as Armor;
                         break;

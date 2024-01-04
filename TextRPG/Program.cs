@@ -379,10 +379,10 @@ namespace TextRPG
         {
             SaveLoad sv = new SaveLoad();
             Program program = new Program();
-            Character myCharacter = sv.LoadPlayerData();
             List<Item> items = program.InitItem();
             Shop shop = new Shop();
             shop.InitShopItems(sv.LoadShopItem());
+            Character myCharacter = sv.LoadPlayerData();
             Rest rest = new Rest();
             Dungeon dungeon = new Dungeon();
             
