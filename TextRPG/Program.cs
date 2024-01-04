@@ -21,6 +21,9 @@ namespace TextRPG
     public class Character
     {
         public int Level { get; set; }
+
+        public int Exp { get; set; }
+
         public string Name { get; set; }
 
         public int _attack;
@@ -28,7 +31,7 @@ namespace TextRPG
         {
             get
             {
-                return (MyWeapon != null)? _attack + MyWeapon.Attack : _attack;
+                return _attack;
             }
             set
             {
@@ -41,7 +44,7 @@ namespace TextRPG
         {
             get
             {
-                return (MyArmor != null)? _defense + MyArmor.Defense : _defense;
+                return _defense;
             }
             set
             {
@@ -68,6 +71,7 @@ namespace TextRPG
             Gold = gold;
             items = new List<Item>();
             MaxHealth = 100;
+            Exp = 0;
         }
 
         public void AddItem(Item item)
@@ -110,9 +114,19 @@ namespace TextRPG
             return MyWeapon == null ? 0 : MyWeapon.Attack;
         }
 
+        public int TotalAttakValue()
+        {
+            return Attack + GetMyWeaponValue();
+        }
+
         public int GetMyArmorValue()
         {
             return MyArmor == null ? 0 : MyArmor.Defense;
+        }
+        
+        public int TotalDefenseValue()
+        {
+            return Defense + GetMyArmorValue();
         }
 
         public void UnEquipWeapon()
@@ -123,6 +137,23 @@ namespace TextRPG
         public void UnEquipArmor()
         {
             MyArmor = null;
+        }
+
+        public void AddExp(int exp)
+        {
+            Exp += exp;
+            if(Exp >= Level)
+            {
+                Exp -= Level;
+                LevelUp();
+            }
+        }
+
+        public void LevelUp()
+        {
+            Level++;
+            Attack += 1;
+            Defense += 1;
         }
     }
 
@@ -232,9 +263,10 @@ namespace TextRPG
         public void DrawMyStat(Character character)
         {
             Console.WriteLine($"Lv. {character.Level:D2}");
+            Console.WriteLine($"EXP : {character.Exp}");
             Console.WriteLine($"{character.Name} ( 전사 )");
-            Console.WriteLine($"공격력 : {character.Attack} (+{character.GetMyWeaponValue()})");
-            Console.WriteLine($"방어력 : {character.Defense} (+{character.GetMyArmorValue()})");
+            Console.WriteLine($"공격력 : {character.TotalAttakValue()} (+{character.GetMyWeaponValue()})");
+            Console.WriteLine($"방어력 : {character.TotalDefenseValue()} (+{character.GetMyArmorValue()})");
             Console.WriteLine($"체 력 : {character.Health}");
             Console.WriteLine($"Gold : {character.Gold} G");
             Console.WriteLine();
@@ -379,7 +411,6 @@ namespace TextRPG
         {
             SaveLoad sv = new SaveLoad();
             Program program = new Program();
-            List<Item> items = program.InitItem();
             Shop shop = new Shop();
             shop.InitShopItems(sv.LoadShopItem());
             Character myCharacter = sv.LoadPlayerData();
