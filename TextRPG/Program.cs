@@ -1,4 +1,6 @@
-﻿namespace TextRPG
+﻿using Newtonsoft.Json.Linq;
+
+namespace TextRPG
 {
     public class Pair<T, U>
     {
@@ -190,6 +192,7 @@
             Console.WriteLine("3. 상점");
             Console.WriteLine("4. 던전입장");
             Console.WriteLine("5. 휴식하기");
+            Console.WriteLine("0. 저장 후 종료");
             Console.WriteLine();
             Console.WriteLine("원하시는 행동을 입력해주세요.");
         }
@@ -340,6 +343,10 @@
                 {
                     Console.Write($"방어력 +{armor.Defense}  | ");
                 }
+                else
+                {
+                    Console.Write($"방어력 +{item.Name}  | ");
+                }
                 Console.Write($"{item.Description}");
                 Console.WriteLine();
                 i++;
@@ -370,12 +377,15 @@
 
         static void Main(string[] args)
         {
+            SaveLoad sv = new SaveLoad();
             Program program = new Program();
-            Character myCharacter = new Character(1, "Chad", 10, 5, 100, 5000);
+            Character myCharacter = sv.LoadPlayerData();
             List<Item> items = program.InitItem();
-            Shop shop = new Shop(items);
+            Shop shop = new Shop();
+            shop.InitShopItems(sv.LoadShopItem());
             Rest rest = new Rest();
             Dungeon dungeon = new Dungeon();
+            
 
             while (true)
             {
@@ -412,6 +422,10 @@
                         case 5:
                             rest.EnterRestRoom(myCharacter);
                             break;
+                        case 0:
+                            sv.SaveCharacterData(myCharacter);
+                            sv.SaveShopItem(shop.shopItems);
+                            return;
                         default:
                             Console.WriteLine("잘못된 입력입니다.");
                             isAvailableInput = true;

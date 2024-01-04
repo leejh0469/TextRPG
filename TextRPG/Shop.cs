@@ -9,13 +9,10 @@ namespace TextRPG
     public class Shop
     {
         public List<Pair<Item, bool>> shopItems;
-        public Shop(List<Item> items)
+
+        public void InitShopItems(List<Pair<Item, bool>> shopItems)
         {
-            shopItems = new List<Pair<Item, bool>>();
-            foreach (Item item in items)
-            {
-                shopItems.Add(new Pair<Item, bool>(item, true));
-            }
+            this.shopItems = shopItems;
         }
 
         public bool isEnoughMoney(int characterGold, int index)
@@ -23,9 +20,11 @@ namespace TextRPG
             return shopItems[index].First.Price <= characterGold;
         }
 
-        public void Buy(int index)
+        public void Buy(int index, Character character)
         {
             shopItems[index].Second = false;
+            character.Gold -= shopItems[index].First.Price;
+            character.AddItem(shopItems[index].First);
         }
 
         public bool CanBuy(int index)
@@ -109,9 +108,8 @@ namespace TextRPG
                                 if(CanBuy(input - 1))
                                 {
                                     Console.WriteLine("구매를 완료했습니다.");
-                                    Buy(input - 1);
-                                    character.Gold -= shopItems[input - 1].First.Price;
-                                    character.AddItem(shopItems[input - 1].First);
+                                    Buy(input - 1, character);
+                                    
                                     break;
                                 }
                                 else
