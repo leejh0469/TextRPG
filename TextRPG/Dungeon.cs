@@ -110,14 +110,13 @@ namespace TextRPG
                 default:
                     break;
             }
+            dungeon.Damage += dungeon.RecommendDefense - character.TotalDefenseValue();
 
-            dungeon.Damage += dungeon.RecommendDefense - character.Defense;
-
-            bool clear = IsClear(dungeon.RecommendDefense, character.Defense, random);
+            bool clear = IsClear(dungeon.RecommendDefense, character.TotalDefenseValue(), random);
 
             if(clear)
             {
-                int additional = random.Next(character.Attack, character.Attack * 2 + 1);
+                int additional = random.Next(character.TotalAttakValue(), character.TotalAttakValue() * 2 + 1) ;
                 dungeon.Reward += dungeon.Reward * additional / 100;
                 Clear(character, dungeon);
             }

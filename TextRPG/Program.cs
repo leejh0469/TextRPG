@@ -114,9 +114,19 @@ namespace TextRPG
             return MyWeapon == null ? 0 : MyWeapon.Attack;
         }
 
+        public int TotalAttakValue()
+        {
+            return Attack + GetMyWeaponValue();
+        }
+
         public int GetMyArmorValue()
         {
             return MyArmor == null ? 0 : MyArmor.Defense;
+        }
+        
+        public int TotalDefenseValue()
+        {
+            return Defense + GetMyArmorValue();
         }
 
         public void UnEquipWeapon()
@@ -255,8 +265,8 @@ namespace TextRPG
             Console.WriteLine($"Lv. {character.Level:D2}");
             Console.WriteLine($"EXP : {character.Exp}");
             Console.WriteLine($"{character.Name} ( 전사 )");
-            Console.WriteLine($"공격력 : {character.Attack + character.GetMyWeaponValue()} (+{character.GetMyWeaponValue()})");
-            Console.WriteLine($"방어력 : {character.Defense + character.GetMyArmorValue()} (+{character.GetMyArmorValue()})");
+            Console.WriteLine($"공격력 : {character.TotalAttakValue()} (+{character.GetMyWeaponValue()})");
+            Console.WriteLine($"방어력 : {character.TotalDefenseValue()} (+{character.GetMyArmorValue()})");
             Console.WriteLine($"체 력 : {character.Health}");
             Console.WriteLine($"Gold : {character.Gold} G");
             Console.WriteLine();
